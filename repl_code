@@ -1,0 +1,60 @@
+
+import requests
+import tkinter as tk
+from PIL import Image, ImageTk
+from io import BytesIO
+google_api_key = "AIzaSyB4CxS9A9Q885iLR9bPLBok7s8GLEKJZ1o"
+api_key = "fLJ4jTnkCoNkgarrwB6f6fDm6U3P1Ftbqji32qkNjv56TISZg2DtzWRq4pciACt9"
+def main():
+  global password
+  destination = destination_entry.get()
+  home = home_entry.get()
+  url = f'https://api.distancematrix.ai/maps/api/distancematrix/json?origins={home}&destinations={destination}&key=fLJ4jTnkCoNkgarrwB6f6fDm6U3P1Ftbqji32qkNjv56TISZg2DtzWRq4pciACt9'
+  response = requests.get(url)
+  distance = response.json()['rows'][0]['elements'][0]['distance']['text']
+  duration = response.json()['rows'][0]['elements'][0]['duration']['text']
+  password = "d872258c216b817fb79e5d07d9934231"
+  weather = requests.get(f"https://api.openweathermap.org/data/2.5/weather?q={destination}&units=imperial&APPID={password}")
+  temp = weather.json()['main']['temp']
+  result_Label.config(text=f"The distance between {home} and {destination} is {distance} and it takes {duration} \n to get from {home} to {destination}; also, the temperature in {destination} is {temp} degrees")
+  get_image()
+
+  
+
+def get_image():
+  home = home_entry.get()
+  destination = destination_entry.get()
+  weather = requests.get(f"https://api.openweathermap.org/data/2.5/weather?q={destination}&units=imperial&APPID={password}")
+  icon = weather.json()["weather"][0]["icon"]
+  global img, image_Label
+  icon_url = f"https://openweathermap.org/img/wn/{icon}@2x.png"
+  response = requests.get(icon_url)
+  image = Image.open(BytesIO(response.content))
+  img = ImageTk.PhotoImage(image)
+  image_Label.config(image=img)
+  image_Label.pack(side = "bottom", fill = "both", expand = "yes")
+
+
+
+
+pear = tk.Tk()
+pear.title("Pear")
+tk.Label(pear, text = "Enter your destination").pack()
+destination_entry = tk.Entry(pear)
+destination_entry.pack()
+tk.Label(pear, text = "Enter your location").pack()
+home_entry = tk.Entry(pear)
+home_entry.pack()
+tk.Button(pear, text="Get Location", command=main).pack()
+image_Label = tk.Label(pear)
+image_Label.pack_forget()
+result_Label = tk.Label(pear, text="Result")
+result_Label.pack()
+pear.mainloop()
+
+
+
+
+main()
+
+
